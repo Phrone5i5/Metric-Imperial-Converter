@@ -5,11 +5,13 @@ function ConvertHandler() {
     let result;
     const unitValueDecimal = /[0-9]*\.?[0-9]*/;
     const unitValueFraction = /[0-9]*\.?(?=[0-9])[0-9]*\/(?=[0-9]|\.)[0-9]*\.?(?=[0-9]*)[0-9]*/;
-    let inputNumbers = input.split('').filter((character, i) => /[a-z]/i.test(character) ? false : true).join('');
-    const doubleFraction = inputNumbers.split('').filter(character => character == '/' ? true : false).length > 1 ? true : false;
-    if (unitValueDecimal.test(inputNumbers) && /\//.test(inputNumbers) == false) {
-      result = parseFloat(inputNumbers);
-    } else if (unitValueFraction.test(inputNumbers) && !doubleFraction) {
+    const inputNumbers = input.split('').filter((character, i) => /[a-z]/i.test(character) ? false : true).join('');
+    const isDoubleFraction = inputNumbers.split('').filter(character => character == '/' ? true : false).length > 1 ? true : false;
+    const isFraction = inputNumbers.split('').filter(character => character == '/' ? true : false).length > 0 ? true : false;
+    if (unitValueDecimal.test(inputNumbers) && !isFraction) {
+      let numberLength = inputNumbers.split('').length;
+      result = numberLength > 0 ? parseFloat(inputNumbers).toFixed(numberLength - 2) : null;
+    } else if (unitValueFraction.test(inputNumbers) && !isDoubleFraction) {
       result = eval(inputNumbers);
     } else {
       console.log('Number format invalid or could not return value');
@@ -84,12 +86,12 @@ function ConvertHandler() {
         break;
       default : console.log('Unable to convert');
     }
-    return result;
+    return result.toFixed(5);
   };
   
   this.getString = function(initNum, initUnit, returnNum, returnUnit) {
     let result;
-    result = `${initNum} ${initUnit} converts to ${returnNum} ${returnUnit}`;
+    result = `${initNum} ${this.spellOutUnit(initUnit)} converts to ${returnNum} ${this.spellOutUnit(returnUnit)}`;
     return result;
   };
   
