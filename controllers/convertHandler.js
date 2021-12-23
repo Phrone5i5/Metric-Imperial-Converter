@@ -1,28 +1,42 @@
 function ConvertHandler() {
   
   this.getNum = function(input) {
-    input ? input = input : input = '1';
     let result;
     const unitValueDecimal = /[0-9]*\.?[0-9]*/;
     const unitValueFraction = /[0-9]*\.?(?=[0-9])[0-9]*\/(?=[0-9]|\.)[0-9]*\.?(?=[0-9]*)[0-9]*/;
-    const inputNumbers = input.split('').filter((character, i) => /[a-z]/i.test(character) ? false : true).join('');
+    let inputNumbers = input.split('').filter((character, i) => /[a-z]/i.test(character) ? false : true).join('');
+    if (!inputNumbers) {
+    	inputNumbers = '1'
+    }
     const isDoubleFraction = inputNumbers.split('').filter(character => character == '/' ? true : false).length > 1 ? true : false;
     const isFraction = inputNumbers.split('').filter(character => character == '/' ? true : false).length > 0 ? true : false;
     if (unitValueDecimal.test(inputNumbers) && !isFraction) {
-      let numberLength = inputNumbers.split('').length;
-      result = numberLength > 0 ? parseFloat(inputNumbers).toFixed(numberLength - 2) : null;
+      let numberLength = inputNumbers.split('').length > 0 ? inputNumbers.split('').length - 1 : 1;
+      result = numberLength > 0 ? parseFloat(inputNumbers).toFixed(numberLength - 1) : parseFloat(inputNumbers);
     } else if (unitValueFraction.test(inputNumbers) && !isDoubleFraction) {
-      result = eval(inputNumbers);
+      result = eval(inputNumbers).toFixed(5);
     } else {
-      console.log('Number format invalid or could not return value');
+      result = 'invalid number';
     }
     return result;
   };
   
   this.getUnit = function(input) {
+    input = input.toLowerCase();
     let result;
-    const unitLabel = /[a-z]+/i;
-    result = input.match(unitLabel)[0].toLowerCase();
+    const unitLabels = ['gal', 'L', 'mi', 'km', 'lbs', 'kg'];
+    const unitLabelRegEx = /[a-z]+/i;
+    const inputLabel = input.match(unitLabelRegEx);
+    if (inputLabel && unitLabels.some(label => inputLabel[0].toLowerCase() == label.toLowerCase() ? true : false)) {
+      result = inputLabel[0];
+    } else {
+      result = 'invalid unit';
+    }
+    if (result == 'l') {
+      result = 'L';
+    } else if (result != 'L' && result) {
+      result = result.toLowerCase();
+    }
     return result;
   };
   
@@ -41,7 +55,8 @@ function ConvertHandler() {
         break;
       case 'kg' : result = 'lbs'
         break;
-      default : console.log('Invalid unit or format');
+      default : result = 'invalid unit';
+        break;
     }
     return result;
   };
@@ -61,9 +76,10 @@ function ConvertHandler() {
         break;
       case 'kg' : result = 'kilograms'
         break;
-      default : console.log('Invalid unit or format');
+      default : result = 'invalid unit';
+        break;
     }    
-    return result;
+    return result ? result : null;
   };
   
   this.convert = function(initNum, initUnit) {
@@ -84,9 +100,10 @@ function ConvertHandler() {
         break;
       case 'kg' : result = initNum / lbsToKg;
         break;
-      default : console.log('Unable to convert');
+      default:
+        break;
     }
-    return result.toFixed(5);
+    return result ? parseFloat(result).toFixed(5) : null;
   };
   
   this.getString = function(initNum, initUnit, returnNum, returnUnit) {
