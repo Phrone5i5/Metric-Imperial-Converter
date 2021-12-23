@@ -14,7 +14,15 @@ module.exports = function (app) {
     let returnNum = convertHandler.convert(initNum, initUnit);
     let returnUnit = convertHandler.getReturnUnit(initUnit);
     let string = convertHandler.getString(initNum, initUnit, returnNum, returnUnit);
-    res.json({ initNum, initUnit, returnNum, returnUnit, string });
+      if (initUnit == 'invalid unit' && initNum == 'invalid number') {
+        res.send('invalid number and unit');
+      } else if (initNum == 'invalid number') {
+        res.send('invalid number');
+      } else if (initUnit == 'invalid unit') {
+        res.send('invalid unit');
+      } else {
+        res.status(200).json({ initNum: parseFloat(initNum), initUnit, returnNum: parseFloat(returnNum), returnUnit, string });
+      }
   });
 
 };
